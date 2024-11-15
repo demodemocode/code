@@ -80,3 +80,59 @@ function deleteResourceWithAuth(resourceId) {
     });
 }
 
+
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: 'https://your-api-url.com',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer YOUR_JWT_TOKEN`, // Replace with your token
+  },
+});
+
+export default apiClient;
+
+
+export const getResource = async (resourceId) => {
+  try {
+    const response = await apiClient.get(`/resources/${resourceId}`);
+    console.log('GET response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error in GET:', error.response ? error.response.data : error.message);
+  }
+};
+
+
+export const createResource = async (data) => {
+  try {
+    const response = await apiClient.post('/resources', data);
+    console.log('POST response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error in POST:', error.response ? error.response.data : error.message);
+  }
+};
+
+
+export const updateResource = async (resourceId, updatedData) => {
+  try {
+    const response = await apiClient.put(`/resources/${resourceId}`, updatedData);
+    console.log('PUT response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error in PUT:', error.response ? error.response.data : error.message);
+  }
+};
+
+export const deleteResource = async (resourceId) => {
+  try {
+    const response = await apiClient.delete(`/resources/${resourceId}`);
+    console.log('DELETE response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error in DELETE:', error.response ? error.response.data : error.message);
+  }
+};
+
