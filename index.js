@@ -136,3 +136,19 @@ export const deleteResource = async (resourceId) => {
   }
 };
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        // Disable CORS by not allowing any origins or methods
+        registry.addMapping("/**") // Apply to all endpoints
+                .allowedOrigins()    // No origins allowed
+                .allowedMethods();   // No methods allowed
+    }
+}
