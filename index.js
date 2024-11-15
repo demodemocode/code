@@ -65,3 +65,18 @@ function printPDF(data, fileName = "data.pdf") {
   doc.save(fileName);
 }
 
+function deleteResourceWithAuth(resourceId) {
+  axios
+    .delete(`https://your-api-url.com/resources/${resourceId}`, {
+      headers: {
+        Authorization: `Bearer YOUR_JWT_TOKEN`
+      }
+    })
+    .then(response => {
+      console.log('Resource deleted:', response.data);
+    })
+    .catch(error => {
+      console.error('Error deleting resource:', error.response ? error.response.data : error.message);
+    });
+}
+
