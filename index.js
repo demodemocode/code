@@ -36,3 +36,32 @@ function downloadExcel(data, fileName = "data.xlsx") {
   // Use FileSaver.js to save the file
   saveAs(blob, fileName);
 }
+
+
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
+function printPDF(data, fileName = "data.pdf") {
+  // Create a new instance of jsPDF
+  const doc = new jsPDF();
+
+  // Extract column headers from data keys
+  const columns = Object.keys(data[0]).map(key => ({ header: key, dataKey: key }));
+
+  // Add title to the PDF
+  doc.text("Data Table", 14, 10);
+
+  // Use AutoTable to add the table
+  doc.autoTable({
+    columns, // Columns for the table
+    body: data, // Data for the table
+    startY: 20, // Table start position
+    theme: "grid", // Table style
+    headStyles: { fillColor: [22, 160, 133] }, // Header color
+    styles: { fontSize: 10 } // Table font size
+  });
+
+  // Save the generated PDF
+  doc.save(fileName);
+}
+
