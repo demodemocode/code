@@ -152,3 +152,41 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods();   // No methods allowed
     }
 }
+
+
+import React from "react";
+import ReactDOM from "react-dom";
+import Report from "./Report"; // Import the Report component
+
+const openReportInNewTab = (data) => {
+  // Open a new blank tab
+  const newTab = window.open("", "_blank");
+
+  if (!newTab) {
+    alert("Failed to open new tab. Check your browser's pop-up blocker.");
+    return;
+  }
+
+  // Write the basic HTML structure to the new tab
+  newTab.document.write(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Report</title>
+      <div id="root"></div>
+    </head>
+    <body>
+      <div id="root"></div>
+    </body>
+    </html>
+  `);
+
+  // Close the document to finish the HTML writing process
+  newTab.document.close();
+
+  // Render the Report component into the new tab
+  ReactDOM.render(<Report data={data} />, newTab.document.getElementById("root"));
+};
+
