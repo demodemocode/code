@@ -6,10 +6,9 @@ BEGIN
 
     DECLARE @xmlQuery XML,
             @merchantCount INT,
-            @totalLength INT,
             @i INT = 1,
-            @merchantNode XML,
-            @updatedNode XML;
+            @merchantMatch XML,
+            @newMatch XML;
 
     -- Get XML from table
     SELECT @xmlQuery = XMLData
@@ -19,40 +18,31 @@ BEGIN
     -- Count how many <terminatedMerchant> exist
     SET @merchantCount = @xmlQuery.value('count(/terminationInquiry/possibleMerchantMatches/terminatedMerchant)', 'INT');
 
-    -- Loop over each terminatedMerchant
+    -- Loop through merchants
     WHILE @i <= @merchantCount
     BEGIN
-        -- Extract the i-th terminatedMerchant
-        SET @merchantNode = @xmlQuery.query('/terminationInquiry/possibleMerchantMatches/terminatedMerchant[position()=sql:variable("@i")]');
+        -- Extract the i-th merchantMatch
+        SET @merchantMatch = @xmlQuery.query('/terminationInquiry/possibleMerchantMatches/terminatedMerchant[position()=sql:variable("@i")]/merchantMatch');
 
-        -- Get just merchantMatch part
-        DECLARE @merchantMatch XML = @merchantNode.query('/terminatedMerchant/merchantMatch');
+        -- Transform merchantMatch using your earlier procedure
+        -- NOTE: Make TransformMerchantMatchXML return via OUTPUT param
+        EXEC dbo.TransformMerchantMatchXML @InputXML=@merchantMatch, @OutputXML=@newMatch OUTPUT;
 
-        -- Transform merchantMatch
-        EXEC dbo.TransformMerchantMatchXML @InputXML = @merchantMatch;
-
-        -- Capture transformed output
-        -- Assume TransformMerchantMatchXML RETURNS XML
-        -- so change it to "OUTPUT parameter" if needed
-        DECLARE @newMatch XML;
-        EXEC dbo.TransformMerchantMatchXML @InputXML=@merchantMatch OUTPUT;
-
-        -- Replace merchantMatch inside merchantNode
-        SET @updatedNode = @merchantNode.modify('
-            replace value of (/terminatedMerchant/merchantMatch)[1]
-            with sql:variable("@newMatch")
-        ');
-
-        -- Update back into main XML
+        -- Remove old <merchantMatch>
         SET @xmlQuery.modify('
-            replace value of (/terminationInquiry/possibleMerchantMatches/terminatedMerchant[position()=sql:variable("@i")])[1]
-            with sql:variable("@updatedNode")
+            delete /terminationInquiry/possibleMerchantMatches/terminatedMerchant[position()=sql:variable("@i")]/merchantMatch
         ');
 
-        SET @i = @i + 1;
+        -- Insert new <merchantMatch>
+        SET @xmlQuery.modify('
+            insert sql:variable("@newMatch")
+            as last into (/terminationInquiry/possibleMerchantMatches/terminatedMerchant[position()=sql:variable("@i")])[1]
+        ');
+
+        SET @i += 1;
     END;
 
-    -- Save back to table
+    -- Save updated XML back to table
     UPDATE MatchPros
     SET XMLData = @xmlQuery
     WHERE Id = @Id;
