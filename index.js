@@ -107,3 +107,25 @@ ________________________________________
 7. Market Potential
 The market for AI coding assistants is rapidly expanding: - GitHub Copilot valuation > $10B - Sourcegraph raises $125M+ for AI code intelligence - Large enterprises looking for AI solutions to reduce dev effort
 Our platform differentiates itself by offering project-level intelligence, not just autocomplete.
+
+
+
+  Required Software for Prototype Setup
+
+Python 3.10 or above
+
+pip (included by default with Python installation)
+
+Required Python libraries:
+
+typer
+rich
+requests
+sentence-transformers
+faiss-cpu
+numpy
+
+
+Please let me know a suitable time if you’d like to discuss the idea further.
+Looking forward to your feedback.
+
